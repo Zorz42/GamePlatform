@@ -13,7 +13,7 @@ void preInit() {
     //swl.window_caption = "Untitled";
     //swl.load_font = false;
     //swl.font_size = 32;
-
+    
     // this library already comes with arial.ttf
     //swl.font_path = "/path/to/font.ttf";
     swl.goFullscreen();
@@ -44,5 +44,8 @@ void controller_main() {
     swl.draw(background_rect);
     if(SDL_NumJoysticks() != 0)
         swl.switchScene(main_scene);
+<<<<<<< HEAD
     /* this is the main loop which executes every frame */
+=======
+>>>>>>> parent of 12a8cd1... now programming on win10 because of macos joystick problems
 }
