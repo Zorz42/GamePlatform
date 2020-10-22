@@ -4,8 +4,15 @@ void main();
 void main_event(SDL_Event& event);
 Swl::scene main_scene(&main, &main_event);
 
+void controller_main();
+Swl::scene no_controller_scene(&controller_main);
+
 Swl::texture text;
 Swl::rect_c test_rect;
+
+SDL_Joystick* main_joystick;
+
+Swl::rect_c background_rect;
 
 void preInit() {
     //swl.window_width = 640;
@@ -21,12 +28,17 @@ void preInit() {
 
 void postInit() {
     swl.switchScene(main_scene);
-    std::cout << swl.window_width << std::endl;
     test_rect.w = 100;
     test_rect.h = 100;
     test_rect.x = swl.window_width - test_rect.w;
     test_rect.y = swl.window_height - test_rect.h;
     test_rect.c = {255, 255, 255};
+    background_rect.w = swl.window_width;
+    background_rect.h = swl.window_height;
+    background_rect.c = {100, 100, 100};
+    std::cout << SDL_NumJoysticks() << std::endl;
+    main_joystick = SDL_JoystickOpen(0);
+    std::cout << main_joystick << std::endl;
 }
 
 void main_event(SDL_Event& event) {
@@ -35,6 +47,14 @@ void main_event(SDL_Event& event) {
 }
 
 void main() {
+    swl.stop();
     swl.draw(test_rect);
-    /* this is the main loop which executes every frame */
+    if(SDL_NumJoysticks() == 0)
+        swl.switchScene(no_controller_scene);
+}
+
+void controller_main() {
+    swl.draw(background_rect);
+    if(SDL_NumJoysticks() != 0)
+        swl.switchScene(main_scene);
 }
