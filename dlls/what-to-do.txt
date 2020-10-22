@@ -1,0 +1,1 @@
+put these dlls beside the exe you are executing

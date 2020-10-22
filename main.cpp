@@ -20,7 +20,7 @@ void preInit() {
     //swl.window_caption = "Untitled";
     //swl.load_font = false;
     //swl.font_size = 32;
-    
+
     // this library already comes with arial.ttf
     //swl.font_path = "/path/to/font.ttf";
     swl.goFullscreen();
