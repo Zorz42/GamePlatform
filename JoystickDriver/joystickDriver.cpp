@@ -9,7 +9,7 @@
 #include "swl.h"
 #include "joystickDriver.h"
 
-SDL_Joystick* main_joystick;
+SDL_Joystick* main_joystick = nullptr;
 
 void no_controller_main();
 Swl::scene no_controller_scene(&no_controller_main);
@@ -17,13 +17,25 @@ Swl::scene* prev_scene = nullptr;
 Swl::texture no_controller_texture;
 
 void jd::init() {
-    main_joystick = SDL_JoystickOpen(0);
+    if(SDL_NumJoysticks())
+        main_joystick = SDL_JoystickOpen(0);
+    else
+        no_controller_at_start = true;
     no_controller_texture.loadFromText("No controller connected!", {255, 255, 255});
 }
 
 #define AXIS_DEAD_ZONE 5000
 
+void switch_to_controller_scene() {
+    prev_scene = &swl.getCurrScene();
+    swl.switchScene(no_controller_scene);
+}
+
 bool jd::handleEvents(SDL_Event& event) {
+    if(no_controller_at_start) {
+        no_controller_at_start = false;
+        switch_to_controller_scene();
+    }
     if(event.type == SDL_JOYAXISMOTION) {
         switch(event.jaxis.axis) {
             case SDL_CONTROLLER_AXIS_LEFTX:
@@ -49,10 +61,8 @@ bool jd::handleEvents(SDL_Event& event) {
         }
         return true;
     }
-    else if(event.type == SDL_JOYDEVICEREMOVED && !SDL_NumJoysticks()) {
-        prev_scene = &swl.getCurrScene();
-        swl.switchScene(no_controller_scene);
-    }
+    else if(event.type == SDL_JOYDEVICEREMOVED && !SDL_NumJoysticks())
+        switch_to_controller_scene();
     return false;
 }
 

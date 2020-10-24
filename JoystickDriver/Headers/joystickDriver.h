@@ -8,4 +8,5 @@ void init();
 bool handleEvents(SDL_Event& event);
 
 inline int right_axis_x = 0, right_axis_y = 0, left_axis_x = 0, left_axis_y = 0;
+inline bool no_controller_at_start = false;
 }
