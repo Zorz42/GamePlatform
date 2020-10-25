@@ -7,7 +7,7 @@
 
 #include "topBar.h"
 #include "joystickDriver.h"
-#include "tiles.h"
+#include "mainScreen.h"
 
 #define BUTTON_SIZE 50
 #define BUTTON_SPACING 10
@@ -40,7 +40,7 @@ bool topBar::handleEvents(SDL_Event &event) {
 
 void topBar::render() {
     static bool prev_active = false, prev_still = true, waiting_axis = false;
-    if(!tiles::on_tiles) {
+    if(!mainScreen::on_tiles) {
         if(!prev_active) {
             axis_position_top_bar = 0;
             waiting_axis = true;
@@ -67,7 +67,7 @@ void topBar::render() {
         swl.draw(selection_rect_top);
         
         if(!waiting_axis && jd::left_axis_y > 30000)
-            tiles::on_tiles = true;
+            mainScreen::on_tiles = true;
     }
     else
         prev_active = false;

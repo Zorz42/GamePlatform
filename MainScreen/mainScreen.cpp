@@ -1,35 +1,16 @@
 #include "swl.h"
+#include "mainScreen.h"
 #include "joystickDriver.h"
 #include "tiles.h"
 #include "topBar.h"
 
-void main();
-void main_event(SDL_Event& event);
-Swl::scene main_scene(&main, &main_event);
-
-int init_start;
-
-void preInit() {
-    init_start = SDL_GetTicks();
-    swl.load_font = true;
-    swl.font_path = "../Resources/arial.ttf";
-    swl.font_size = 32;
-    
-    swl.goFullscreen();
-    SDL_ShowCursor(SDL_DISABLE);
-    swl.enableVsync();
-}
-
-void postInit() {
-    jd::init();
-    main_scene.background_color = {10, 10, 10};
-    swl.switchScene(main_scene);
+void mainScreen::init() {
+    main_screen_scene.background_color = {10, 10, 10};
     tiles::init();
     topBar::init();
-    std::cout << "Init done in: " << (float)(SDL_GetTicks() - init_start) / 1000 << "s" << std::endl;
 }
 
-void main_event(SDL_Event& event) {
+void mainScreen::main_event(SDL_Event& event) {
     if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
         swl.stop();
     else if(jd::handleEvents(event));
@@ -38,7 +19,7 @@ void main_event(SDL_Event& event) {
         topBar::handleEvents(event);
 }
 
-void main() {
+void mainScreen::main_render() {
     tiles::render();
     topBar::render();
 }

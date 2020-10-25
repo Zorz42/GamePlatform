@@ -7,6 +7,7 @@
 
 #include "tiles.h"
 #include "joystickDriver.h"
+#include "mainScreen.h"
 #include <vector>
 
 #define TILE_SIZE 500
@@ -75,7 +76,7 @@ void tiles::init() {
 }
 
 bool tiles::handleEvents(SDL_Event &event) {
-    if(on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected)
+    if(mainScreen::on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected)
         swl.stop();
     return false;
 }
@@ -83,7 +84,7 @@ bool tiles::handleEvents(SDL_Event &event) {
 void tiles::render() {
     static bool prev_active = false, prev_still = true, waiting_axis = false;
     static int velocity = INITIAL_VELOCITY;
-    if(on_tiles) {
+    if(mainScreen::on_tiles) {
         if(!prev_active)
             waiting_axis = true;
         prev_active = true;
@@ -111,13 +112,13 @@ void tiles::render() {
     to_go = selected * (TILE_SIZE + TILE_SPACING);
     position = abs(position - to_go) < DIVIDER ? to_go : position + (to_go - position) / DIVIDER;
     
-    if(on_tiles) {
+    if(mainScreen::on_tiles) {
         selection_rect.x = swl.window_width / 2 - selection_rect.w / 2 + to_go - position;
         swl.draw(selection_rect);
         
         if(!waiting_axis && jd::left_axis_y < -30000)
-            on_tiles = false;
+            mainScreen::on_tiles = false;
     }
     for(unsigned int i = 0; i < tiles_arr.size(); i++)
-        tiles_arr.at(i).render(i, on_tiles);
+        tiles_arr.at(i).render(i, mainScreen::on_tiles);
 }
