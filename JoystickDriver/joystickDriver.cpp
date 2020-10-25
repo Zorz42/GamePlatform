@@ -16,15 +16,17 @@ Swl::scene no_controller_scene(&no_controller_main);
 Swl::scene* prev_scene = nullptr;
 Swl::texture no_controller_texture;
 
+#define AXIS_DEAD_ZONE 5000
+
 void jd::init() {
-    if(SDL_NumJoysticks())
+    if(SDL_NumJoysticks()) {
         main_joystick = SDL_JoystickOpen(0);
+        SDL_JoystickSetPlayerIndex(main_joystick, 1);
+    }
     else
         no_controller_at_start = true;
     no_controller_texture.loadFromText("No controller connected!", {255, 255, 255});
 }
-
-#define AXIS_DEAD_ZONE 5000
 
 void switch_to_controller_scene() {
     prev_scene = &swl.getCurrScene();
@@ -74,6 +76,7 @@ void no_controller_event(SDL_Event& event) {
 void no_controller_main() {
     if(SDL_NumJoysticks()) {
         main_joystick = SDL_JoystickOpen(0);
+        SDL_JoystickSetPlayerIndex(main_joystick, 1);
         swl.switchScene(*prev_scene);
     }
     swl.draw(no_controller_texture);
