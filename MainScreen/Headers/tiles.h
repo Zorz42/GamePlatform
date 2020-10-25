@@ -11,4 +11,5 @@ namespace tiles {
 void init();
 bool handleEvents(SDL_Event& event);
 void render();
+inline bool on_tiles = true;
 }

@@ -20,7 +20,7 @@ struct tile {
 public:
     Swl::color color;
     std::string text;
-    void render(unsigned int index);
+    void render(unsigned int index, bool on_tiles);
     void renderText();
     tile(Swl::color color, std::string text) : color(color), text(text) {}
 private:
@@ -35,7 +35,7 @@ std::vector<tile> tiles_arr;
 int axis_position = 0, to_go = 0, position = 0, selected = 0;
 Swl::rect_c selection_rect;
 
-void tile::render(unsigned int index) {
+void tile::render(unsigned int index, bool on_tiles) {
     Swl::rect_c draw_rect;
     draw_rect.w = TILE_SIZE;
     draw_rect.h = TILE_SIZE;
@@ -44,7 +44,7 @@ void tile::render(unsigned int index) {
     draw_rect.c = color;
     draw_rect.corner_radius = TILE_SPACING / 2;
     swl.draw(draw_rect);
-    if(index == selected)
+    if(on_tiles && index == selected)
         swl.draw(_text_texture);
 }
 
@@ -75,37 +75,49 @@ void tiles::init() {
 }
 
 bool tiles::handleEvents(SDL_Event &event) {
-    if(event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected)
+    if(on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected)
         swl.stop();
     return false;
 }
 
 void tiles::render() {
-    static bool prev_still = true;
+    static bool prev_active = false, prev_still = true, waiting_axis = false;
     static int velocity = INITIAL_VELOCITY;
-    if(!jd::left_axis_x) {
-        axis_position = to_go;
-        prev_still = true;
-        velocity = INITIAL_VELOCITY;
+    if(on_tiles) {
+        if(!prev_active)
+            waiting_axis = true;
+        prev_active = true;
+        if(!jd::left_axis_x) {
+            axis_position = to_go;
+            prev_still = true;
+            velocity = INITIAL_VELOCITY;
+            waiting_axis = false;
+        }
+        else if(!waiting_axis && abs(jd::left_axis_x) > abs(jd::left_axis_y * 3)) {
+            axis_position += prev_still && jd::left_axis_x > 0 ? TILE_SIZE + TILE_SPACING : jd::left_axis_x / velocity;
+            prev_still = false;
+            if(velocity >= PEAK_VELOCITY)
+                velocity -= ACCELERATION;
+        }
+        if(axis_position < 0)
+            axis_position = 0;
+        else if(axis_position > (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1))
+            axis_position = (TILE_SIZE + TILE_SPACING) * (unsigned int)(tiles_arr.size() - 1);
     }
-    else if(abs(jd::left_axis_x) > abs(jd::left_axis_y)) {
-        axis_position += prev_still && jd::left_axis_x > 0 ? TILE_SIZE + TILE_SPACING : jd::left_axis_x / velocity;
-        prev_still = false;
-        if(velocity >= PEAK_VELOCITY)
-            velocity -= ACCELERATION;
-    }
-    if(axis_position < 0)
-        axis_position = 0;
-    else if(axis_position > (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1))
-        axis_position = (TILE_SIZE + TILE_SPACING) * (unsigned int)(tiles_arr.size() - 1);
+    else
+        prev_active = false;
     
     selected = axis_position / (TILE_SIZE + TILE_SPACING);
     to_go = selected * (TILE_SIZE + TILE_SPACING);
     position = abs(position - to_go) < DIVIDER ? to_go : position + (to_go - position) / DIVIDER;
     
-    selection_rect.x = swl.window_width / 2 - selection_rect.w / 2 + to_go - position;
-    swl.draw(selection_rect);
-    
+    if(on_tiles) {
+        selection_rect.x = swl.window_width / 2 - selection_rect.w / 2 + to_go - position;
+        swl.draw(selection_rect);
+        
+        if(!waiting_axis && jd::left_axis_y < -30000)
+            on_tiles = false;
+    }
     for(unsigned int i = 0; i < tiles_arr.size(); i++)
-        tiles_arr.at(i).render(i);
+        tiles_arr.at(i).render(i, on_tiles);
 }

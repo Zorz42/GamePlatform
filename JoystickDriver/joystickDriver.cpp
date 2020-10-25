@@ -16,7 +16,7 @@ Swl::scene no_controller_scene(&no_controller_main);
 Swl::scene* prev_scene = nullptr;
 Swl::texture no_controller_texture;
 
-#define AXIS_DEAD_ZONE 5000
+#define AXIS_DEAD_ZONE 10000
 
 void jd::init() {
     if(SDL_NumJoysticks()) {
