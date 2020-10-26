@@ -11,8 +11,12 @@
 #include "selectionRect.h"
 #include <vector>
 
-#define TILE_SIZE 500
-#define TILE_SPACING 100
+
+#define TILE_SIZE_RAW 500
+#define TILE_SPACING_RAW 100
+
+#define TILE_SIZE TILE_SIZE_RAW * scale
+#define TILE_SPACING TILE_SPACING_RAW * scale
 #define DIVIDER 7
 #define INITIAL_VELOCITY 1000
 #define PEAK_VELOCITY 320
@@ -34,13 +38,14 @@ void init();
 }
 
 std::vector<tile> tiles_arr;
-int axis_position = 0, to_go = 0, position = 0, selected = 0;
+int position = 0, selected = 0;
+float scale = 1, scale_to_go = scale;
 
 void tile::render(unsigned int index, bool on_tiles) {
     Swl::rect_c draw_rect;
     draw_rect.w = TILE_SIZE;
     draw_rect.h = TILE_SIZE;
-    draw_rect.x = swl.window_width / 2 - draw_rect.w / 2 + index * (draw_rect.w + TILE_SPACING) - position;
+    draw_rect.x = swl.window_width / 2 - draw_rect.w / 2 + index * (draw_rect.w + TILE_SPACING) - position * scale;
     draw_rect.y = swl.window_height / 2 - draw_rect.h / 2;
     draw_rect.c = color;
     draw_rect.corner_radius = TILE_SPACING / 2;
@@ -57,7 +62,7 @@ void tile::renderText() {
 
 void tiles::init() {
     tiles_arr = {
-        tile({255, 0 ,0}, "turn off"),
+        tile({255, 0 ,0}, "tile0"),
         tile({0, 255, 0}, "tile1"),
         tile({255, 255, 0}, "tile2"),
         tile({0, 0, 255}, "tile3"),
@@ -70,26 +75,29 @@ void tiles::init() {
 }
 
 bool tiles::handleEvents(SDL_Event &event) {
-    if(mainScreen::on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected)
-        swl.stop();
     return false;
 }
 
 void tiles::render() {
     static bool prev_active = false, prev_still = true, waiting_axis = false, waiting_axis_movement = false;
-    static int velocity = INITIAL_VELOCITY;
+    static int velocity = INITIAL_VELOCITY, axis_position = 0, to_go = 0;
+    
+    scale = (scale + scale_to_go) / 2;
+    
     if(mainScreen::on_tiles) {
         if(!prev_active) {
-            selectionRect::w = TILE_SIZE + TILE_SPACING;
-            selectionRect::h = TILE_SIZE + TILE_SPACING;
+            scale_to_go = 1;
+            selectionRect::w = TILE_SIZE_RAW + TILE_SPACING_RAW;
+            selectionRect::h = TILE_SIZE_RAW + TILE_SPACING_RAW;
             selectionRect::y = swl.window_height / 2 - selectionRect::h / 2;
-            selectionRect::corner_radius = TILE_SPACING;
+            selectionRect::corner_radius = TILE_SPACING_RAW;
             waiting_axis = true;
             waiting_axis_movement = true;
         }
         prev_active = true;
         if(!jd::left_axis_x) {
-            axis_position = to_go;
+            if(!waiting_axis_movement)
+                axis_position = to_go;
             prev_still = true;
             velocity = INITIAL_VELOCITY;
             waiting_axis = false;
@@ -104,17 +112,12 @@ void tiles::render() {
         }
         if(axis_position < 0)
             axis_position = 0;
-        else if(axis_position > (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1))
-            axis_position = (TILE_SIZE + TILE_SPACING) * (unsigned int)(tiles_arr.size() - 1);
-    }
-    else
-        prev_active = false;
-    
-    selected = axis_position / (TILE_SIZE + TILE_SPACING);
-    to_go = selected * (TILE_SIZE + TILE_SPACING);
-    position = abs(position - to_go) < DIVIDER ? to_go : position + (to_go - position) / DIVIDER;
-    
-    if(mainScreen::on_tiles) {
+        else if(axis_position > (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1) && !waiting_axis_movement)
+            axis_position = (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1);
+        
+        selected = axis_position / (TILE_SIZE + TILE_SPACING);
+        to_go = selected * (TILE_SIZE + TILE_SPACING);
+        position += abs(position - to_go) < DIVIDER ? (position > to_go ? 1 : -1) : (to_go - position) / DIVIDER;
         selectionRect::x = swl.window_width / 2 - selectionRect::w / 2 + to_go - position;
         if(!waiting_axis_movement)
             selectionRect::teleport();
@@ -122,6 +125,11 @@ void tiles::render() {
         if(!waiting_axis && jd::left_axis_y < -30000)
             mainScreen::on_tiles = false;
     }
+    else {
+        scale_to_go = .75;
+        prev_active = false;
+    }
+    
     for(unsigned int i = 0; i < tiles_arr.size(); i++)
         tiles_arr.at(i).render(i, mainScreen::on_tiles);
 }
