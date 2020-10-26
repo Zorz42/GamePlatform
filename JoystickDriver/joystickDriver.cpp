@@ -12,7 +12,8 @@
 SDL_Joystick* main_joystick = nullptr;
 
 void no_controller_main();
-Swl::scene no_controller_scene(&no_controller_main);
+void no_controller_event(SDL_Event& event);
+Swl::scene no_controller_scene(&no_controller_main, &no_controller_event);
 Swl::scene* prev_scene = nullptr;
 Swl::texture no_controller_texture;
 
