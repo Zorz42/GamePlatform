@@ -14,7 +14,7 @@ Swl::rect_c selection_rect, selection_rect_outline;
 
 void selectionRect::init() {
     selection_rect.c = {80, 80, 80};
-    selection_rect_outline.c = {255, 255, 255};
+    selection_rect_outline.c = {120, 120, 120};
 }
 
 void selectionRect::render() {
