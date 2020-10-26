@@ -8,6 +8,7 @@
 #include "tiles.h"
 #include "joystickDriver.h"
 #include "mainScreen.h"
+#include "selectionRect.h"
 #include <vector>
 
 #define TILE_SIZE 500
@@ -34,7 +35,6 @@ void init();
 
 std::vector<tile> tiles_arr;
 int axis_position = 0, to_go = 0, position = 0, selected = 0;
-Swl::rect_c selection_rect;
 
 void tile::render(unsigned int index, bool on_tiles) {
     Swl::rect_c draw_rect;
@@ -67,12 +67,6 @@ void tiles::init() {
     };
     for(tile& iter : tiles_arr)
         iter.renderText();
-    
-    selection_rect.w = TILE_SIZE + TILE_SPACING;
-    selection_rect.h = TILE_SIZE + TILE_SPACING;
-    selection_rect.y = swl.window_height / 2 - selection_rect.h / 2;
-    selection_rect.c = {80, 80, 80};
-    selection_rect.corner_radius = TILE_SPACING;
 }
 
 bool tiles::handleEvents(SDL_Event &event) {
@@ -82,11 +76,17 @@ bool tiles::handleEvents(SDL_Event &event) {
 }
 
 void tiles::render() {
-    static bool prev_active = false, prev_still = true, waiting_axis = false;
+    static bool prev_active = false, prev_still = true, waiting_axis = false, waiting_axis_movement = false;
     static int velocity = INITIAL_VELOCITY;
     if(mainScreen::on_tiles) {
-        if(!prev_active)
+        if(!prev_active) {
+            selectionRect::w = TILE_SIZE + TILE_SPACING;
+            selectionRect::h = TILE_SIZE + TILE_SPACING;
+            selectionRect::y = swl.window_height / 2 - selectionRect::h / 2;
+            selectionRect::corner_radius = TILE_SPACING;
             waiting_axis = true;
+            waiting_axis_movement = true;
+        }
         prev_active = true;
         if(!jd::left_axis_x) {
             axis_position = to_go;
@@ -99,6 +99,8 @@ void tiles::render() {
             prev_still = false;
             if(velocity >= PEAK_VELOCITY)
                 velocity -= ACCELERATION;
+            if(!waiting_axis)
+                waiting_axis_movement = false;
         }
         if(axis_position < 0)
             axis_position = 0;
@@ -113,8 +115,9 @@ void tiles::render() {
     position = abs(position - to_go) < DIVIDER ? to_go : position + (to_go - position) / DIVIDER;
     
     if(mainScreen::on_tiles) {
-        selection_rect.x = swl.window_width / 2 - selection_rect.w / 2 + to_go - position;
-        swl.draw(selection_rect);
+        selectionRect::x = swl.window_width / 2 - selectionRect::w / 2 + to_go - position;
+        if(!waiting_axis_movement)
+            selectionRect::teleport();
         
         if(!waiting_axis && jd::left_axis_y < -30000)
             mainScreen::on_tiles = false;

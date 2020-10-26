@@ -8,22 +8,17 @@
 #include "topBar.h"
 #include "joystickDriver.h"
 #include "mainScreen.h"
+#include "selectionRect.h"
 
 #define BUTTON_SIZE 50
 #define BUTTON_SPACING 10
 #define INITIAL_BUTTON_SPACING (BUTTON_SPACING * 4)
 #define VELOCITY 5000
 
-Swl::rect_c buttons[3], selection_rect_top;
+Swl::rect_c buttons[3];
 int selected_top_bar = 0, axis_position_top_bar = 0, position_top_bar = 0;
 
 void topBar::init() {
-    selection_rect_top.w = BUTTON_SIZE + BUTTON_SPACING;
-    selection_rect_top.h = BUTTON_SIZE + BUTTON_SPACING;
-    selection_rect_top.x = BUTTON_SPACING / 2;
-    selection_rect_top.y = BUTTON_SPACING / 2;
-    selection_rect_top.c = {80, 80, 80};
-    selection_rect_top.corner_radius = BUTTON_SPACING;
     for(int i = 0; i < 3; i++) {
         buttons[i].w = BUTTON_SIZE;
         buttons[i].h = BUTTON_SIZE;
@@ -42,7 +37,11 @@ void topBar::render() {
     static bool prev_active = false, prev_still = true, waiting_axis = false;
     if(!mainScreen::on_tiles) {
         if(!prev_active) {
-            axis_position_top_bar = 0;
+            selectionRect::w = BUTTON_SIZE + BUTTON_SPACING;
+            selectionRect::h = BUTTON_SIZE + BUTTON_SPACING;
+            selectionRect::x = BUTTON_SPACING / 2;
+            selectionRect::y = BUTTON_SPACING / 2;
+            selectionRect::corner_radius = BUTTON_SPACING;
             waiting_axis = true;
         }
         prev_active = true;
@@ -63,8 +62,7 @@ void topBar::render() {
         selected_top_bar = axis_position_top_bar / (BUTTON_SIZE + BUTTON_SPACING);
         position_top_bar = selected_top_bar * (BUTTON_SIZE + BUTTON_SPACING);
         
-        selection_rect_top.x = selected_top_bar * (BUTTON_SIZE + BUTTON_SPACING) + INITIAL_BUTTON_SPACING - BUTTON_SPACING / 2;
-        swl.draw(selection_rect_top);
+        selectionRect::x = selected_top_bar * (BUTTON_SIZE + BUTTON_SPACING) + INITIAL_BUTTON_SPACING - BUTTON_SPACING / 2;
         
         if(!waiting_axis && jd::left_axis_y > 30000)
             mainScreen::on_tiles = true;

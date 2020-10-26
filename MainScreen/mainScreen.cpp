@@ -3,11 +3,13 @@
 #include "joystickDriver.h"
 #include "tiles.h"
 #include "topBar.h"
+#include "selectionRect.h"
 
 void mainScreen::init() {
     main_screen_scene.background_color = {10, 10, 10};
     tiles::init();
     topBar::init();
+    selectionRect::init();
 }
 
 void mainScreen::main_event(SDL_Event& event) {
@@ -20,6 +22,7 @@ void mainScreen::main_event(SDL_Event& event) {
 }
 
 void mainScreen::main_render() {
+    selectionRect::render();
     tiles::render();
     topBar::render();
 }
