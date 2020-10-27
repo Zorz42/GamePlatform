@@ -8,6 +8,7 @@
 #include "swl.h"
 #include "mainScreen.h"
 #include "joystickDriver.h"
+#include "fileSystem.h"
 
 int init_start;
 
@@ -24,6 +25,7 @@ void preInit() {
 
 void postInit() {
     jd::init();
+    fileSystem::init();
     mainScreen::init();
     swl.switchScene(mainScreen::main_screen_scene);
     std::cout << "Init done in: " << (float)(SDL_GetTicks() - init_start) / 1000 << "s" << std::endl;
