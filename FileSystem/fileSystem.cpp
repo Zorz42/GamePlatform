@@ -21,6 +21,7 @@ void fileSystem::init() {
     std::string dirs_to_create[] = {
         "",
         "Games",
+        "Game Data",
     };
     for(std::string& dir : dirs_to_create)
         createDirIfExists(root + dir);
