@@ -13,11 +13,11 @@
 #define VELOCITY 5000
 #define DIVIDER 3
 
+int selected_top_bar = 0;
+
 void topBar::init() {
     
 }
-
-int selected_top_bar = 0;
 
 bool topBar::handleEvents(SDL_Event &event) {
     if(!mainScreen::on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross && !selected_top_bar)
@@ -46,6 +46,7 @@ void topBar::render() {
             selectionRect::x = button_spacing_to_go / 2;
             selectionRect::y = button_spacing_to_go / 2;
             selectionRect::corner_radius = button_spacing_to_go;
+            axis_position_top_bar = 0;
             waiting_axis = true;
         }
         prev_active = true;

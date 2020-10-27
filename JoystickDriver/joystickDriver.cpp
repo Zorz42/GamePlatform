@@ -26,7 +26,7 @@ void jd::init() {
     }
     else
         no_controller_at_start = true;
-    no_controller_texture.loadFromText("No controller connected!", {255, 255, 255});
+    no_controller_texture.loadFromText("No controller connected!", {255, 255, 255}, true);
 }
 
 void switch_to_controller_scene() {

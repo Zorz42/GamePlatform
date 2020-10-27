@@ -31,12 +31,17 @@ void mainScreen::main_render() {
     tiles::render();
     topBar::render();
     
+    static int secs_passed = 0;
     static Swl::texture time_texture;
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    std::stringstream time_string;
-    time_string << std::put_time(&tm, "%H:%M");
-    time_texture.loadFromText(time_string.str(), {255, 255, 255});
-    time_texture.x = swl.window_width - time_texture.getWidth() - TIME_SPACING_RIGHT;
+    
+    if(SDL_GetTicks() / 1000 >= secs_passed) {
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::stringstream time_string;
+        time_string << std::put_time(&tm, "%H:%M");
+        time_texture.loadFromText(time_string.str(), {255, 255, 255});
+        time_texture.x = swl.window_width - time_texture.getWidth() - TIME_SPACING_RIGHT;
+        secs_passed = SDL_GetTicks() / 1000 + 1;
+    }
     swl.draw(time_texture);
 }

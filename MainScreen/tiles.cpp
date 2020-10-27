@@ -55,7 +55,7 @@ void tile::render(unsigned int index, bool on_tiles) {
 }
 
 void tile::renderText() {
-    _text_texture.loadFromText(text, {255, 255, 255});
+    _text_texture.loadFromText(text, {255, 255, 255}, true);
     _text_texture.x = swl.window_width / 2 - _text_texture.getWidth() / 2;
     _text_texture.y = swl.window_height / 2 + TILE_SIZE / 2 + TILE_SPACING / 4 * 3;
 }
