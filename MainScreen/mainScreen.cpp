@@ -40,7 +40,7 @@ void mainScreen::main_render() {
         std::stringstream time_string;
         time_string << std::put_time(&tm, "%H:%M");
         time_texture.loadFromText(time_string.str(), {255, 255, 255});
-        time_texture.x = swl.window_width - time_texture.getWidth() - TIME_SPACING_RIGHT;
+        time_texture.x = swl.window_width - time_texture.w - TIME_SPACING_RIGHT;
         secs_passed = SDL_GetTicks() / 1000 + 1;
     }
     swl.draw(time_texture);

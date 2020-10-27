@@ -7,12 +7,15 @@
 
 #include "gameReader.h"
 #include "fileSystem.h"
+#include "swl.h"
+#include "tiles.h"
+#include "mainScreen.h"
 #include <fstream>
 #include <map>
 
 std::pair<bool, gameReader::game> gameReader::loadGame(std::string path) {
     game result;
-    path = path + "/";
+    path.push_back('/');
     
     std::map<std::string, std::string> info;
     std::ifstream info_file(path + "Info.data");
@@ -41,6 +44,33 @@ std::pair<bool, gameReader::game> gameReader::loadGame(std::string path) {
         return {false, result};
     
     result.name = info["Name"];
+    result.dir_path = path;
+    if(info.find("Icon") != info.end())
+        result.icon_path = info["Icon"];
+    
     return {true, result};
 }
 
+
+void gameReader::game::loadImage() {
+    if(std::filesystem::is_regular_file(dir_path + icon_path))
+        _icon_texture.loadFromImage(dir_path + icon_path);
+    else
+        _icon_texture.loadFromImage("../Resources/no-icon.jpg");
+}
+
+void gameReader::game::renderText() {
+    _text_texture.loadFromText(name, {255, 255, 255}, true);
+    _text_texture.x = swl.window_width / 2 - _text_texture.w / 2;
+    _text_texture.y = swl.window_height / 2 + TILE_SIZE / 2 + TILE_SPACING / 4 * 3;
+}
+
+void gameReader::game::render(unsigned int index, float scale, int position, int selected) {
+    _icon_texture.w = TILE_SIZE * scale;
+    _icon_texture.h = TILE_SIZE * scale;
+    _icon_texture.x = swl.window_width / 2 - _icon_texture.w / 2 + index * (_icon_texture.w + TILE_SPACING * scale) - position * scale;
+    _icon_texture.y = swl.window_height / 2 - _icon_texture.h / 2;
+    swl.draw(_icon_texture);
+    if(mainScreen::on_tiles && index == selected)
+        swl.draw(_text_texture);
+}
