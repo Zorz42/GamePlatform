@@ -82,7 +82,3 @@ void no_controller_main() {
     }
     swl.draw(no_controller_texture);
 }
-
-int jd::getPercentageLevel() {
-    return SDL_JoystickCurrentPowerLevel(main_joystick);
-}
