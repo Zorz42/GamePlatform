@@ -12,11 +12,8 @@
 #include <vector>
 
 
-#define TILE_SIZE_RAW 500
-#define TILE_SPACING_RAW 100
-
-#define TILE_SIZE TILE_SIZE_RAW * scale
-#define TILE_SPACING TILE_SPACING_RAW * scale
+#define TILE_SIZE 500
+#define TILE_SPACING 100
 #define DIVIDER 7
 #define INITIAL_VELOCITY 1000
 #define PEAK_VELOCITY 320
@@ -43,12 +40,12 @@ float scale = 1, scale_to_go = scale;
 
 void tile::render(unsigned int index, bool on_tiles) {
     Swl::rect_c draw_rect;
-    draw_rect.w = TILE_SIZE;
-    draw_rect.h = TILE_SIZE;
-    draw_rect.x = swl.window_width / 2 - draw_rect.w / 2 + index * (draw_rect.w + TILE_SPACING) - position * scale;
+    draw_rect.w = TILE_SIZE * scale;
+    draw_rect.h = TILE_SIZE * scale;
+    draw_rect.x = swl.window_width / 2 - draw_rect.w / 2 + index * (draw_rect.w + TILE_SPACING * scale) - position * scale;
     draw_rect.y = swl.window_height / 2 - draw_rect.h / 2;
     draw_rect.c = color;
-    draw_rect.corner_radius = TILE_SPACING / 2;
+    draw_rect.corner_radius = TILE_SPACING / 2 * scale;
     swl.draw(draw_rect);
     if(on_tiles && index == selected)
         swl.draw(_text_texture);
@@ -87,10 +84,10 @@ void tiles::render() {
     if(mainScreen::on_tiles) {
         if(!prev_active) {
             scale_to_go = 1;
-            selectionRect::w = TILE_SIZE_RAW + TILE_SPACING_RAW;
-            selectionRect::h = TILE_SIZE_RAW + TILE_SPACING_RAW;
+            selectionRect::w = TILE_SIZE + TILE_SPACING;
+            selectionRect::h = TILE_SIZE + TILE_SPACING;
             selectionRect::y = swl.window_height / 2 - selectionRect::h / 2;
-            selectionRect::corner_radius = TILE_SPACING_RAW;
+            selectionRect::corner_radius = TILE_SPACING;
             waiting_axis = true;
             waiting_axis_movement = true;
         }
@@ -113,7 +110,7 @@ void tiles::render() {
         if(axis_position < 0)
             axis_position = 0;
         else if(axis_position > (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1) && !waiting_axis_movement)
-            axis_position = (TILE_SIZE + TILE_SPACING) * (tiles_arr.size() - 1);
+            axis_position = (TILE_SIZE + TILE_SPACING) * (int)(tiles_arr.size() - 1);
         
         selected = axis_position / (TILE_SIZE + TILE_SPACING);
         to_go = selected * (TILE_SIZE + TILE_SPACING);
