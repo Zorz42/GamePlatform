@@ -75,7 +75,7 @@ void tiles::render() {
         selected = axis_position / (TILE_SIZE + TILE_SPACING);
         to_go = selected * (TILE_SIZE + TILE_SPACING);
         if(position != to_go)
-            position += abs(position - to_go) < DIVIDER ? (position > to_go ? 1 : -1) : (to_go - position) / DIVIDER;
+            position += abs(position - to_go) < DIVIDER ? (position > to_go ? -1 : 1) : (to_go - position) / DIVIDER;
         selectionRect::x = swl.window_width / 2 - selectionRect::w / 2 + to_go - position;
         if(!waiting_axis_movement)
             selectionRect::teleport();
