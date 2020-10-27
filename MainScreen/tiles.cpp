@@ -9,7 +9,10 @@
 #include "joystickDriver.h"
 #include "mainScreen.h"
 #include "selectionRect.h"
+#include "gameReader.h"
+#include "fileSystem.h"
 #include <vector>
+#include <filesystem>
 
 
 #define TILE_SIZE 500
@@ -58,15 +61,14 @@ void tile::renderText() {
 }
 
 void tiles::init() {
-    tiles_arr = {
-        tile({255, 0 ,0}, "tile0"),
-        tile({0, 255, 0}, "tile1"),
-        tile({255, 255, 0}, "tile2"),
-        tile({0, 0, 255}, "tile3"),
-        tile({255, 0, 255}, "tile4"),
-        tile({0, 255, 255}, "tile5"),
-        tile({255, 255, 255}, "tile6"),
-    };
+    for (const auto& entry : std::filesystem::directory_iterator(fileSystem::root + "Games")) {
+        std::pair<bool, gameReader::game> result = gameReader::loadGame(entry.path());
+        if(!result.first)
+            std::cout << "Error loading " << entry.path() << std::endl;
+        else
+            tiles_arr.push_back(tile({uint8_t(rand()), uint8_t(rand()), uint8_t(rand())}, result.second.name));
+    }
+
     for(tile& iter : tiles_arr)
         iter.renderText();
 }
