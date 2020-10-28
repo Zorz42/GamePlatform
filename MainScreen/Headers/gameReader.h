@@ -8,6 +8,8 @@
 #include <vector>
 #include "swl.h"
 
+#pragma once
+
 namespace gameReader {
 class game {
 public:

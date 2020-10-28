@@ -11,6 +11,7 @@
 #include "selectionRect.h"
 #include "gameReader.h"
 #include "fileSystem.h"
+#include "gameRenderer.h"
 #include <vector>
 #include <filesystem>
 
@@ -32,6 +33,10 @@ void tiles::init() {
 }
 
 bool tiles::handleEvents(SDL_Event &event) {
+    if(mainScreen::on_tiles && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == jd::button::cross) {
+        gameRenderer::launchGame(games.at(selected));
+        return true;
+    }
     return false;
 }
 
@@ -47,7 +52,7 @@ void tiles::render() {
             selectionRect::w = TILE_SIZE + TILE_SPACING;
             selectionRect::h = TILE_SIZE + TILE_SPACING;
             selectionRect::y = swl.window_height / 2 - selectionRect::h / 2;
-            selectionRect::corner_radius = TILE_SPACING;
+            selectionRect::corner_radius = TILE_SPACING / 2;
             waiting_axis = true;
             waiting_axis_movement = true;
         }
@@ -83,7 +88,7 @@ void tiles::render() {
         to_go = selected * (TILE_SIZE + TILE_SPACING);
     }
     else {
-        scale_to_go = .75;
+        scale_to_go = .85;
         prev_active = false;
     }
     if(position != to_go)
