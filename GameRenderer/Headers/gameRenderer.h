@@ -5,8 +5,9 @@
 //  Created by Jakob Zorz on 28/10/2020.
 //
 
-#include "gameReader.h"
+#include "gameLoader.h"
 
 namespace gameRenderer {
-void launchGame(gameReader::game& game);
+void init();
+void launchGame(gameLoader::game& game);
 }

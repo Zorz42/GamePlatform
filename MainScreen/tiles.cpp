@@ -9,19 +9,19 @@
 #include "joystickDriver.h"
 #include "mainScreen.h"
 #include "selectionRect.h"
-#include "gameReader.h"
+#include "gameLoader.h"
 #include "fileSystem.h"
 #include "gameRenderer.h"
 #include <vector>
 #include <filesystem>
 
-std::vector<gameReader::game> games;
+std::vector<gameLoader::game> games;
 int position = 0, selected = 0;
 float scale = 1, scale_to_go = scale;
 
 void tiles::init() {
     for (const auto& entry : std::filesystem::directory_iterator(fileSystem::root + "Games")) {
-        std::pair<bool, gameReader::game> result = gameReader::loadGame(entry.path());
+        std::pair<bool, gameLoader::game> result = gameLoader::loadGame(entry.path());
         if(!result.first)
             std::cout << "Error loading " << entry.path() << std::endl;
         else {

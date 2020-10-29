@@ -1,5 +1,5 @@
 //
-//  gameReader.h
+//  gameLoader.h
 //  GamePlatform
 //
 //  Created by Jakob Zorz on 27/10/2020.
@@ -10,10 +10,10 @@
 
 #pragma once
 
-namespace gameReader {
+namespace gameLoader {
 class game {
 public:
-    std::string name, icon_path, dir_path;
+    std::string name, icon_path, dir_path, exec_path;
     void loadImage();
     void renderText();
     void render(unsigned int index, float scale, int position, int selected);
